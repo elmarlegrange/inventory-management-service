@@ -1,7 +1,7 @@
-namespace InventoryManagement.Infrastructure.Data;
-
 using Microsoft.Extensions.Configuration;
 using Npgsql;
+
+namespace InventoryManagement.Infrastructure.Data;
 
 /// <summary>
 /// Npgsql implementation of IDbConnectionFactory using application configuration.
@@ -21,16 +21,13 @@ public sealed class NpgsqlConnectionFactory : IDbConnectionFactory
     public NpgsqlConnectionFactory(string connectionString)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
-        
         _connectionString = connectionString;
     }
 
     public async Task<NpgsqlConnection> CreateConnectionAsync(CancellationToken cancellationToken = default)
     {
         var connection = new NpgsqlConnection(_connectionString);
-        
         await connection.OpenAsync(cancellationToken);
-        
         return connection;
     }
 }

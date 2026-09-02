@@ -1,7 +1,9 @@
-namespace InventoryManagement.Infrastructure;
-
-using Data;
+using InventoryManagement.Domain.Interfaces;
+using InventoryManagement.Infrastructure.Data;
+using InventoryManagement.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
+
+namespace InventoryManagement.Infrastructure;
 
 public static class DependencyInjection
 {
@@ -9,6 +11,9 @@ public static class DependencyInjection
     {
         services.AddSingleton<IDbConnectionFactory, NpgsqlConnectionFactory>();
         services.AddSingleton<DatabaseInitializer>();
+
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IWarehouseRepository, WarehouseRepository>();
 
         return services;
     }

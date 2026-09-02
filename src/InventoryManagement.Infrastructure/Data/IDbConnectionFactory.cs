@@ -1,6 +1,6 @@
-namespace InventoryManagement.Infrastructure.Data;
-
 using Npgsql;
+
+namespace InventoryManagement.Infrastructure.Data;
 
 /// <summary>
 /// Factory abstraction for creating asynchronous PostgreSQL database connections.

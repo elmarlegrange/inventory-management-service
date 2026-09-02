@@ -1,0 +1,37 @@
+namespace InventoryManagement.Domain.Entities;
+
+public sealed class StockTransfer
+{
+    public Guid Id { get; }
+    public string Sku { get; }
+    public string SourceWarehouseCode { get; }
+    public string DestinationWarehouseCode { get; }
+    public int Quantity { get; }
+    public DateTime TransferredAt { get; }
+
+    public StockTransfer(
+        Guid id,
+        string sku,
+        string sourceWarehouseCode,
+        string destinationWarehouseCode,
+        int quantity,
+        DateTime? transferredAt = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sku);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourceWarehouseCode);
+        ArgumentException.ThrowIfNullOrWhiteSpace(destinationWarehouseCode);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
+
+        if (sourceWarehouseCode.Trim().Equals(destinationWarehouseCode.Trim(), StringComparison.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException("Source and destination warehouses cannot be identical.");
+        }
+
+        Id = id == Guid.Empty ? Guid.NewGuid() : id;
+        Sku = sku.Trim().ToUpperInvariant();
+        SourceWarehouseCode = sourceWarehouseCode.Trim().ToUpperInvariant();
+        DestinationWarehouseCode = destinationWarehouseCode.Trim().ToUpperInvariant();
+        Quantity = quantity;
+        TransferredAt = transferredAt ?? DateTime.UtcNow;
+    }
+}

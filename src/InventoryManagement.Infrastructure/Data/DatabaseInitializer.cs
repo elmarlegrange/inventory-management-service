@@ -1,7 +1,7 @@
-namespace InventoryManagement.Infrastructure.Data;
-
 using Dapper;
 using Microsoft.Extensions.Logging;
+
+namespace InventoryManagement.Infrastructure.Data;
 
 /// <summary>
 /// Initializes the PostgreSQL database schema, tables, indices, and constraints.
