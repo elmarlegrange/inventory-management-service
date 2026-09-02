@@ -20,7 +20,7 @@ public sealed class WarehouseRepository : IWarehouseRepository
     public async Task<IReadOnlyList<Warehouse>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         const string sql = """
-            SELECT code, name, created_at AS CreatedAt
+            SELECT code AS Code, name AS Name, created_at AS CreatedAt
             FROM warehouses
             ORDER BY created_at DESC;
         """;
@@ -34,7 +34,7 @@ public sealed class WarehouseRepository : IWarehouseRepository
     public async Task<Warehouse?> GetByCodeAsync(string code, CancellationToken cancellationToken = default)
     {
         const string sql = """
-            SELECT code, name, created_at AS CreatedAt
+            SELECT code AS Code, name AS Name, created_at AS CreatedAt
             FROM warehouses
             WHERE UPPER(code) = UPPER(@Code);
         """;

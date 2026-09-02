@@ -1,3 +1,4 @@
+using InventoryManagement.Application.Stock;
 using InventoryManagement.Domain.Entities;
 using InventoryManagement.Domain.Exceptions;
 using InventoryManagement.Domain.Interfaces;
@@ -7,32 +8,35 @@ namespace InventoryManagement.Application.Products;
 public sealed class ProductService : IProductService
 {
     private readonly IProductRepository _productRepository;
+    private readonly IStockRepository _stockRepository;
 
-    public ProductService(IProductRepository productRepository)
+    public ProductService(IProductRepository productRepository, IStockRepository stockRepository)
     {
         _productRepository = productRepository;
+        _stockRepository = stockRepository;
     }
 
     public async Task<IReadOnlyList<ProductDto>> GetAllProductsAsync(CancellationToken cancellationToken = default)
     {
         var products = await _productRepository.GetAllAsync(cancellationToken);
-        return products.Select(p => new ProductDto(p.Sku, p.Name, p.CreatedAt)).ToList();
+        return products.Select(p => new ProductDto(p.Code, p.Name, p.CreatedAt)).ToList();
     }
 
-    public async Task<ProductDto> GetProductBySkuAsync(string sku, CancellationToken cancellationToken = default)
+    public async Task<ProductDto> GetProductByCodeAsync(string code, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(sku))
+        if (string.IsNullOrWhiteSpace(code))
         {
-            throw new ValidationException("sku", "Product SKU must not be empty.");
+            throw new ValidationException("code", "Product code must not be empty.");
         }
 
-        var product = await _productRepository.GetBySkuAsync(sku.Trim(), cancellationToken);
+        var normalizedCode = code.Trim().ToUpperInvariant();
+        var product = await _productRepository.GetByCodeAsync(normalizedCode, cancellationToken);
         if (product is null)
         {
-            throw new EntityNotFoundException("Product", sku.Trim().ToUpperInvariant());
+            throw new EntityNotFoundException("Product", normalizedCode);
         }
 
-        return new ProductDto(product.Sku, product.Name, product.CreatedAt);
+        return new ProductDto(product.Code, product.Name, product.CreatedAt);
     }
 
     public async Task<ProductDto> CreateProductAsync(CreateProductRequest request, CancellationToken cancellationToken = default)
@@ -41,13 +45,13 @@ public sealed class ProductService : IProductService
 
         var errors = new Dictionary<string, string[]>();
 
-        if (string.IsNullOrWhiteSpace(request.Sku))
+        if (string.IsNullOrWhiteSpace(request.Code))
         {
-            errors["sku"] = new[] { "Product SKU is required and cannot be empty." };
+            errors["code"] = new[] { "Product code is required and cannot be empty." };
         }
-        else if (request.Sku.Trim().Length > 50)
+        else if (request.Code.Trim().Length > 50)
         {
-            errors["sku"] = new[] { "Product SKU must not exceed 50 characters." };
+            errors["code"] = new[] { "Product code must not exceed 50 characters." };
         }
 
         if (string.IsNullOrWhiteSpace(request.Name))
@@ -64,16 +68,34 @@ public sealed class ProductService : IProductService
             throw new ValidationException("Product validation failed.", errors);
         }
 
-        var normalizedSku = request.Sku.Trim().ToUpperInvariant();
-        var exists = await _productRepository.ExistsAsync(normalizedSku, cancellationToken);
+        var normalizedCode = request.Code.Trim().ToUpperInvariant();
+        var exists = await _productRepository.ExistsAsync(normalizedCode, cancellationToken);
         if (exists)
         {
-            throw new DuplicateEntityException("Product", normalizedSku);
+            throw new DuplicateEntityException("Product", normalizedCode);
         }
 
-        var product = new Product(normalizedSku, request.Name.Trim());
+        var product = new Product(normalizedCode, request.Name.Trim());
         await _productRepository.CreateAsync(product, cancellationToken);
 
-        return new ProductDto(product.Sku, product.Name, product.CreatedAt);
+        return new ProductDto(product.Code, product.Name, product.CreatedAt);
+    }
+
+    public async Task<IReadOnlyList<ProductStockLocationDto>> GetStockForProductAsync(string code, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            throw new ValidationException("code", "Product code must not be empty.");
+        }
+
+        var normalizedCode = code.Trim().ToUpperInvariant();
+        var exists = await _productRepository.ExistsAsync(normalizedCode, cancellationToken);
+        if (!exists)
+        {
+            throw new EntityNotFoundException("Product", normalizedCode);
+        }
+
+        var locations = await _stockRepository.GetProductStockDetailsAsync(normalizedCode, cancellationToken);
+        return locations.Select(l => new ProductStockLocationDto(l.WarehouseCode, l.WarehouseName, l.Quantity, l.UpdatedAt)).ToList();
     }
 }

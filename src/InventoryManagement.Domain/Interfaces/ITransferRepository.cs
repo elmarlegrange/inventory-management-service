@@ -5,7 +5,7 @@ namespace InventoryManagement.Domain.Interfaces;
 public interface ITransferRepository
 {
     Task<StockTransfer> ExecuteTransferAsync(
-        string sku,
+        string productCode,
         string sourceWarehouseCode,
         string destinationWarehouseCode,
         int quantity,

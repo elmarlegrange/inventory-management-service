@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json;
 using InventoryManagement.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -79,7 +80,7 @@ public sealed class GlobalExceptionHandlerMiddleware
                     Instance = instance,
                     Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
                 };
-                problem.Extensions["sku"] = stockEx.Sku;
+                problem.Extensions["productCode"] = stockEx.ProductCode;
                 problem.Extensions["warehouseCode"] = stockEx.WarehouseCode;
                 problem.Extensions["requiredQuantity"] = stockEx.RequiredQuantity;
                 problem.Extensions["availableQuantity"] = stockEx.AvailableQuantity;

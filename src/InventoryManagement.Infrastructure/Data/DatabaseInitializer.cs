@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 namespace InventoryManagement.Infrastructure.Data;
 
 /// <summary>
-/// Initializes the PostgreSQL database schema, tables, indices, and constraints.
+/// Initializes the PostgreSQL 17 database schema, tables, indices, and constraints.
 /// </summary>
 public sealed class DatabaseInitializer
 {
@@ -24,7 +24,7 @@ public sealed class DatabaseInitializer
         const string sql = """
             -- 1. Products Table
             CREATE TABLE IF NOT EXISTS products (
-                sku VARCHAR(50) PRIMARY KEY,
+                code VARCHAR(50) PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
@@ -39,17 +39,17 @@ public sealed class DatabaseInitializer
             -- 3. Stock Table (Composite PK + Invariant Check Constraint)
             CREATE TABLE IF NOT EXISTS stock (
                 warehouse_code VARCHAR(50) NOT NULL REFERENCES warehouses(code) ON DELETE CASCADE,
-                sku VARCHAR(50) NOT NULL REFERENCES products(sku) ON DELETE CASCADE,
+                product_code VARCHAR(50) NOT NULL REFERENCES products(code) ON DELETE CASCADE,
                 quantity INT NOT NULL DEFAULT 0,
                 updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                PRIMARY KEY (warehouse_code, sku),
+                PRIMARY KEY (warehouse_code, product_code),
                 CONSTRAINT chk_stock_quantity_non_negative CHECK (quantity >= 0)
             );
 
             -- 4. Stock Transfers / Audit Trail
             CREATE TABLE IF NOT EXISTS stock_transfers (
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                sku VARCHAR(50) NOT NULL REFERENCES products(sku),
+                product_code VARCHAR(50) NOT NULL REFERENCES products(code),
                 source_warehouse_code VARCHAR(50) NOT NULL REFERENCES warehouses(code),
                 destination_warehouse_code VARCHAR(50) NOT NULL REFERENCES warehouses(code),
                 quantity INT NOT NULL CHECK (quantity > 0),
@@ -57,8 +57,8 @@ public sealed class DatabaseInitializer
             );
 
             -- Performance Indices
-            CREATE INDEX IF NOT EXISTS idx_stock_sku ON stock(sku);
-            CREATE INDEX IF NOT EXISTS idx_transfers_sku ON stock_transfers(sku);
+            CREATE INDEX IF NOT EXISTS idx_stock_product_code ON stock(product_code);
+            CREATE INDEX IF NOT EXISTS idx_transfers_product_code ON stock_transfers(product_code);
             CREATE INDEX IF NOT EXISTS idx_transfers_source ON stock_transfers(source_warehouse_code);
         """;
 

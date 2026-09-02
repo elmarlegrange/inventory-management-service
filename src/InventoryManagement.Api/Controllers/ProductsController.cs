@@ -1,4 +1,5 @@
 using InventoryManagement.Application.Products;
+using InventoryManagement.Application.Stock;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.Api.Controllers;
@@ -23,12 +24,12 @@ public sealed class ProductsController : ControllerBase
         return Ok(products);
     }
 
-    [HttpGet("{sku}")]
+    [HttpGet("{code}")]
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ProductDto>> GetBySku(string sku, CancellationToken cancellationToken)
+    public async Task<ActionResult<ProductDto>> GetByCode(string code, CancellationToken cancellationToken)
     {
-        var product = await _productService.GetProductBySkuAsync(sku, cancellationToken);
+        var product = await _productService.GetProductByCodeAsync(code, cancellationToken);
         return Ok(product);
     }
 
@@ -39,6 +40,17 @@ public sealed class ProductsController : ControllerBase
     public async Task<ActionResult<ProductDto>> Create([FromBody] CreateProductRequest request, CancellationToken cancellationToken)
     {
         var created = await _productService.CreateProductAsync(request, cancellationToken);
-        return CreatedAtAction(nameof(GetBySku), new { sku = created.Sku }, created);
+        return CreatedAtAction(nameof(GetByCode), new { code = created.Code }, created);
+    }
+
+    [HttpGet("{code}/stock")]
+    [ProducesResponseType(typeof(IReadOnlyList<ProductStockLocationDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IReadOnlyList<ProductStockLocationDto>>> GetStock(
+        [FromRoute] string code,
+        CancellationToken cancellationToken)
+    {
+        var stock = await _productService.GetStockForProductAsync(code, cancellationToken);
+        return Ok(stock);
     }
 }

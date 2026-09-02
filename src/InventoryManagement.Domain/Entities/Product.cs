@@ -2,16 +2,16 @@ namespace InventoryManagement.Domain.Entities;
 
 public sealed class Product
 {
-    public string Sku { get; }
+    public string Code { get; }
     public string Name { get; private set; }
     public DateTime CreatedAt { get; }
 
-    public Product(string sku, string name, DateTime? createdAt = null)
+    public Product(string code, string name, DateTime? createdAt = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(sku);
+        ArgumentException.ThrowIfNullOrWhiteSpace(code);
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
-        Sku = sku.Trim().ToUpperInvariant();
+        Code = code.Trim().ToUpperInvariant();
         Name = name.Trim();
         CreatedAt = createdAt ?? DateTime.UtcNow;
     }

@@ -1,3 +1,3 @@
 namespace InventoryManagement.Application.Products;
 
-public sealed record CreateProductRequest(string Sku, string Name);
+public sealed record CreateProductRequest(string Code, string Name);

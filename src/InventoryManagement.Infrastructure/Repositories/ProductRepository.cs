@@ -20,7 +20,7 @@ public sealed class ProductRepository : IProductRepository
     public async Task<IReadOnlyList<Product>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         const string sql = """
-            SELECT sku, name, created_at AS CreatedAt
+            SELECT code AS Code, name AS Name, created_at AS CreatedAt
             FROM products
             ORDER BY created_at DESC;
         """;
@@ -28,35 +28,35 @@ public sealed class ProductRepository : IProductRepository
         await using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
         var result = await connection.QueryAsync<ProductDbModel>(new CommandDefinition(sql, cancellationToken: cancellationToken));
 
-        return result.Select(r => new Product(r.Sku, r.Name, r.CreatedAt)).ToList();
+        return result.Select(r => new Product(r.Code, r.Name, r.CreatedAt)).ToList();
     }
 
-    public async Task<Product?> GetBySkuAsync(string sku, CancellationToken cancellationToken = default)
+    public async Task<Product?> GetByCodeAsync(string code, CancellationToken cancellationToken = default)
     {
         const string sql = """
-            SELECT sku, name, created_at AS CreatedAt
+            SELECT code AS Code, name AS Name, created_at AS CreatedAt
             FROM products
-            WHERE UPPER(sku) = UPPER(@Sku);
+            WHERE UPPER(code) = UPPER(@Code);
         """;
 
         await using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
         var result = await connection.QuerySingleOrDefaultAsync<ProductDbModel>(
-            new CommandDefinition(sql, new { Sku = sku }, cancellationToken: cancellationToken));
+            new CommandDefinition(sql, new { Code = code }, cancellationToken: cancellationToken));
 
-        return result is null ? null : new Product(result.Sku, result.Name, result.CreatedAt);
+        return result is null ? null : new Product(result.Code, result.Name, result.CreatedAt);
     }
 
-    public async Task<bool> ExistsAsync(string sku, CancellationToken cancellationToken = default)
+    public async Task<bool> ExistsAsync(string code, CancellationToken cancellationToken = default)
     {
         const string sql = """
             SELECT COUNT(1)
             FROM products
-            WHERE UPPER(sku) = UPPER(@Sku);
+            WHERE UPPER(code) = UPPER(@Code);
         """;
 
         await using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
         var count = await connection.ExecuteScalarAsync<int>(
-            new CommandDefinition(sql, new { Sku = sku }, cancellationToken: cancellationToken));
+            new CommandDefinition(sql, new { Code = code }, cancellationToken: cancellationToken));
 
         return count > 0;
     }
@@ -64,8 +64,8 @@ public sealed class ProductRepository : IProductRepository
     public async Task CreateAsync(Product product, CancellationToken cancellationToken = default)
     {
         const string sql = """
-            INSERT INTO products (sku, name, created_at)
-            VALUES (@Sku, @Name, @CreatedAt);
+            INSERT INTO products (code, name, created_at)
+            VALUES (@Code, @Name, @CreatedAt);
         """;
 
         try
@@ -73,12 +73,12 @@ public sealed class ProductRepository : IProductRepository
             await using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
             await connection.ExecuteAsync(new CommandDefinition(
                 sql,
-                new { product.Sku, product.Name, product.CreatedAt },
+                new { product.Code, product.Name, product.CreatedAt },
                 cancellationToken: cancellationToken));
         }
         catch (PostgresException ex) when (ex.SqlState == PostgresErrorCodes.UniqueViolation)
         {
-            throw new DuplicateEntityException("Product", product.Sku);
+            throw new DuplicateEntityException("Product", product.Code);
         }
     }
 }

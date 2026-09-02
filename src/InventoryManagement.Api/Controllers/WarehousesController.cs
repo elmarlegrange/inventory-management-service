@@ -1,3 +1,4 @@
+using InventoryManagement.Application.Stock;
 using InventoryManagement.Application.Warehouses;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,5 +41,30 @@ public sealed class WarehousesController : ControllerBase
     {
         var created = await _warehouseService.CreateWarehouseAsync(request, cancellationToken);
         return CreatedAtAction(nameof(GetByCode), new { code = created.Code }, created);
+    }
+
+    [HttpGet("{code}/stock")]
+    [ProducesResponseType(typeof(IReadOnlyList<WarehouseStockItemDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IReadOnlyList<WarehouseStockItemDto>>> GetStock(
+        [FromRoute] string code,
+        CancellationToken cancellationToken)
+    {
+        var stock = await _warehouseService.GetStockForWarehouseAsync(code, cancellationToken);
+        return Ok(stock);
+    }
+
+    [HttpPost("{code}/stock")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AddStock(
+        [FromRoute] string code,
+        [FromBody] AddStockItemRequest request,
+        CancellationToken cancellationToken)
+    {
+        await _warehouseService.AddStockToWarehouseAsync(code, request, cancellationToken);
+        return Ok();
     }
 }

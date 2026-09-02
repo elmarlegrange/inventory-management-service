@@ -1,3 +1,3 @@
 namespace InventoryManagement.Application.Products;
 
-public sealed record ProductDto(string Sku, string Name, DateTime CreatedAt);
+public sealed record ProductDto(string Code, string Name, DateTime CreatedAt);

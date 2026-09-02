@@ -3,7 +3,7 @@ namespace InventoryManagement.Domain.Entities;
 public sealed class StockTransfer
 {
     public Guid Id { get; }
-    public string Sku { get; }
+    public string ProductCode { get; }
     public string SourceWarehouseCode { get; }
     public string DestinationWarehouseCode { get; }
     public int Quantity { get; }
@@ -11,13 +11,13 @@ public sealed class StockTransfer
 
     public StockTransfer(
         Guid id,
-        string sku,
+        string productCode,
         string sourceWarehouseCode,
         string destinationWarehouseCode,
         int quantity,
         DateTime? transferredAt = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(sku);
+        ArgumentException.ThrowIfNullOrWhiteSpace(productCode);
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceWarehouseCode);
         ArgumentException.ThrowIfNullOrWhiteSpace(destinationWarehouseCode);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
@@ -28,7 +28,7 @@ public sealed class StockTransfer
         }
 
         Id = id == Guid.Empty ? Guid.NewGuid() : id;
-        Sku = sku.Trim().ToUpperInvariant();
+        ProductCode = productCode.Trim().ToUpperInvariant();
         SourceWarehouseCode = sourceWarehouseCode.Trim().ToUpperInvariant();
         DestinationWarehouseCode = destinationWarehouseCode.Trim().ToUpperInvariant();
         Quantity = quantity;

@@ -3,18 +3,18 @@ namespace InventoryManagement.Domain.Entities;
 public sealed class Stock
 {
     public string WarehouseCode { get; }
-    public string Sku { get; }
+    public string ProductCode { get; }
     public int Quantity { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
-    public Stock(string warehouseCode, string sku, int quantity, DateTime? updatedAt = null)
+    public Stock(string warehouseCode, string productCode, int quantity, DateTime? updatedAt = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(warehouseCode);
-        ArgumentException.ThrowIfNullOrWhiteSpace(sku);
+        ArgumentException.ThrowIfNullOrWhiteSpace(productCode);
         ArgumentOutOfRangeException.ThrowIfNegative(quantity);
 
         WarehouseCode = warehouseCode.Trim().ToUpperInvariant();
-        Sku = sku.Trim().ToUpperInvariant();
+        ProductCode = productCode.Trim().ToUpperInvariant();
         Quantity = quantity;
         UpdatedAt = updatedAt ?? DateTime.UtcNow;
     }
