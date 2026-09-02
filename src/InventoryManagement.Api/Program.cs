@@ -1,19 +1,35 @@
+using InventoryManagement.Infrastructure;
+using InventoryManagement.Infrastructure.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddInfrastructure();
 
 var app = builder.Build();
 
+// Run database initialization on startup
+try
+{
+    using var scope = app.Services.CreateScope();
+    var dbInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
+    await dbInitializer.InitializeAsync();
+}
+catch (Exception ex)
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogWarning(ex, "Could not initialize database on startup. Ensure PostgreSQL is running.");
+}
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
-app.Run();
