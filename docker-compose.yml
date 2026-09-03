@@ -22,7 +22,7 @@ services:
     image: inventory-api:latest
     container_name: inventory-api
     build:
-      context: .
+      context: ./server
       dockerfile: Dockerfile
     restart: unless-stopped
     environment:

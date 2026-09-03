@@ -5,7 +5,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-336791?logo=postgresql)
 ![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker)
 
-A high-performance, containerized .NET 10 REST API for multi-warehouse inventory management, real-time stock tracking, and race-condition-free stock transfers built with Clean Architecture, Dapper, and PostgreSQL.
+A high-performance, containerized .NET 10 REST API for multi-warehouse inventory management, real-time stock tracking, and race-condition-free stock transfers built with Clean Architecture, Dapper, and PostgreSQL in a scalable monorepo.
 
 ---
 
@@ -60,7 +60,7 @@ docker compose down
 
 ### Option 2: Running Locally with .NET CLI
 
-1. Ensure PostgreSQL is running and update the connection string in `src/InventoryManagement.Api/appsettings.json`:
+1. Ensure PostgreSQL is running and update the connection string in `server/src/InventoryManagement.Api/appsettings.json`:
    ```json
    "ConnectionStrings": {
      "DefaultConnection": "Host=localhost;Port=5432;Database=inventory_db;Username=postgres;Password=postgres"
@@ -69,7 +69,7 @@ docker compose down
 
 2. Run the API:
    ```bash
-   dotnet run --project src/InventoryManagement.Api
+   dotnet run --project server/src/InventoryManagement.Api
    ```
 
 3. Navigate to Swagger: [https://localhost:7148/swagger](https://localhost:7148/swagger) or [http://localhost:5000/swagger](http://localhost:5000/swagger)
@@ -187,38 +187,42 @@ FOR UPDATE;
 ### Unit Tests
 Executes 93 unit tests covering Domain entities, Application services, and API controllers using `Shouldly` assertions and `Moq`:
 ```bash
-dotnet test tests/InventoryManagement.UnitTests
+dotnet test server/tests/InventoryManagement.UnitTests
 ```
 
 ### Integration Tests
 Executes end-to-end integration tests and the **20-thread concurrent race condition test** using real PostgreSQL instances managed by `Testcontainers`:
 ```bash
-dotnet test tests/InventoryManagement.IntegrationTests
+dotnet test server/tests/InventoryManagement.IntegrationTests
 ```
 
 ### Run Entire Test Suite
 ```bash
-dotnet test
+dotnet test server/InventoryManagement.slnx
 ```
 
 ---
 
-## Project Structure
+## Monorepo Project Structure
 
 ```
 inventory-management-service/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml                        # GitHub Actions CI pipeline
-├── src/
-│   ├── InventoryManagement.Domain/       # Domain Entities, Exceptions & Interfaces
-│   ├── InventoryManagement.Application/  # DTOs, Business Logic & Service Interfaces
-│   ├── InventoryManagement.Infrastructure/ # PostgreSQL Schema, Dapper Repositories
-│   └── InventoryManagement.Api/          # Controllers, Middleware & Configuration
-├── tests/
-│   ├── InventoryManagement.UnitTests/    # 93 Unit Tests (Shouldly + Moq)
-│   └── InventoryManagement.IntegrationTests/ # 12 Testcontainers Integration Tests
-├── Dockerfile                            # Multi-stage production container build
+├── apps/
+│   └── web/                              # Vue 3 / Vite Single Page Application
+├── server/                               # .NET 10 Clean Architecture Backend
+│   ├── src/
+│   │   ├── InventoryManagement.Domain/       # Domain Entities, Exceptions & Interfaces
+│   │   ├── InventoryManagement.Application/  # DTOs, Business Logic & Service Interfaces
+│   │   ├── InventoryManagement.Infrastructure/ # PostgreSQL Schema, Dapper Repositories
+│   │   └── InventoryManagement.Api/          # Controllers, Middleware & Configuration
+│   ├── tests/
+│   │   ├── InventoryManagement.UnitTests/    # 93 Unit Tests (Shouldly + Moq)
+│   │   └── InventoryManagement.IntegrationTests/ # 12 Testcontainers Integration Tests
+│   ├── Dockerfile                        # Multi-stage backend container build
+│   └── InventoryManagement.slnx          # .NET Solution File
 ├── docker-compose.yml                    # Local multi-container orchestration
 └── README.md
 ```

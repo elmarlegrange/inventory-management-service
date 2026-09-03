@@ -21,16 +21,16 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore Dependencies
-        run: dotnet restore
+        run: dotnet restore server/InventoryManagement.slnx
 
       - name: Build Solution (Enforce Zero Warnings)
-        run: dotnet build --configuration Release --no-restore --warnaserror
+        run: dotnet build server/InventoryManagement.slnx --configuration Release --no-restore --warnaserror
 
       - name: Run Unit Tests (Shouldly)
-        run: dotnet test tests/InventoryManagement.UnitTests/InventoryManagement.UnitTests.csproj --configuration Release --no-build --logger "trx;LogFileName=unit-tests.trx" --verbosity normal
+        run: dotnet test server/tests/InventoryManagement.UnitTests/InventoryManagement.UnitTests.csproj --configuration Release --no-build --logger "trx;LogFileName=unit-tests.trx" --verbosity normal
 
       - name: Run Integration Tests (Testcontainers & PostgreSQL)
-        run: dotnet test tests/InventoryManagement.IntegrationTests/InventoryManagement.IntegrationTests.csproj --configuration Release --no-build --logger "trx;LogFileName=integration-tests.trx" --verbosity normal
+        run: dotnet test server/tests/InventoryManagement.IntegrationTests/InventoryManagement.IntegrationTests.csproj --configuration Release --no-build --logger "trx;LogFileName=integration-tests.trx" --verbosity normal
 
       - name: Verify Production Docker Build
-        run: docker build -t inventory-api:latest .
+        run: docker build -t inventory-api:latest ./server
