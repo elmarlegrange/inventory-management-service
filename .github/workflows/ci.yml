@@ -1,0 +1,36 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Build & Test (.NET 10 & PostgreSQL)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build Solution (Enforce Zero Warnings)
+        run: dotnet build --configuration Release --no-restore --warnaserror
+
+      - name: Run Unit Tests (Shouldly)
+        run: dotnet test tests/InventoryManagement.UnitTests/InventoryManagement.UnitTests.csproj --configuration Release --no-build --logger "trx;LogFileName=unit-tests.trx" --verbosity normal
+
+      - name: Run Integration Tests (Testcontainers & PostgreSQL)
+        run: dotnet test tests/InventoryManagement.IntegrationTests/InventoryManagement.IntegrationTests.csproj --configuration Release --no-build --logger "trx;LogFileName=integration-tests.trx" --verbosity normal
+
+      - name: Verify Production Docker Build
+        run: docker build -t inventory-api:latest .
