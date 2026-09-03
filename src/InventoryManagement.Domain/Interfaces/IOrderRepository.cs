@@ -2,9 +2,9 @@ using InventoryManagement.Domain.Entities;
 
 namespace InventoryManagement.Domain.Interfaces;
 
-public interface ITransferRepository
+public interface IOrderRepository
 {
-    Task<StockTransfer> ExecuteTransferAsync(
+    Task<Order> CreateOrderAsync(
         string productCode,
         string sourceWarehouseCode,
         string destinationWarehouseCode,

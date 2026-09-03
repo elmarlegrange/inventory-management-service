@@ -88,13 +88,13 @@ public sealed class GlobalExceptionHandlerMiddleware
                 return (StatusCodes.Status400BadRequest, problem);
             }
 
-            case InvalidTransferException invalidTransferEx:
+            case InvalidOrderException invalidOrderEx:
             {
                 var problem = new ProblemDetails
                 {
                     Status = StatusCodes.Status400BadRequest,
-                    Title = "Invalid Transfer Request",
-                    Detail = invalidTransferEx.Message,
+                    Title = "Invalid Order Request",
+                    Detail = invalidOrderEx.Message,
                     Instance = instance,
                     Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
                 };

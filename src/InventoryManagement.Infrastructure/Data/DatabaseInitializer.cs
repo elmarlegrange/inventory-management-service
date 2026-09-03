@@ -46,20 +46,20 @@ public sealed class DatabaseInitializer
                 CONSTRAINT chk_stock_quantity_non_negative CHECK (quantity >= 0)
             );
 
-            -- 4. Stock Transfers / Audit Trail
-            CREATE TABLE IF NOT EXISTS stock_transfers (
+            -- 4. Orders Table
+            CREATE TABLE IF NOT EXISTS orders (
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                 product_code VARCHAR(50) NOT NULL REFERENCES products(code),
                 source_warehouse_code VARCHAR(50) NOT NULL REFERENCES warehouses(code),
                 destination_warehouse_code VARCHAR(50) NOT NULL REFERENCES warehouses(code),
                 quantity INT NOT NULL CHECK (quantity > 0),
-                transferred_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
 
             -- Performance Indices
             CREATE INDEX IF NOT EXISTS idx_stock_product_code ON stock(product_code);
-            CREATE INDEX IF NOT EXISTS idx_transfers_product_code ON stock_transfers(product_code);
-            CREATE INDEX IF NOT EXISTS idx_transfers_source ON stock_transfers(source_warehouse_code);
+            CREATE INDEX IF NOT EXISTS idx_orders_product_code ON orders(product_code);
+            CREATE INDEX IF NOT EXISTS idx_orders_source_warehouse ON orders(source_warehouse_code);
         """;
 
         await using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);

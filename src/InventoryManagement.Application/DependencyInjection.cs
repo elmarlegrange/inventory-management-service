@@ -1,3 +1,4 @@
+using InventoryManagement.Application.Orders;
 using InventoryManagement.Application.Products;
 using InventoryManagement.Application.Warehouses;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IWarehouseService, WarehouseService>();
+        services.AddScoped<IOrderService, OrderService>();
 
         return services;
     }
