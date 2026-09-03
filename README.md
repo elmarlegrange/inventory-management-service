@@ -72,7 +72,7 @@ docker compose down
    dotnet run --project server/src/InventoryManagement.Api
    ```
 
-3. Navigate to Swagger: [https://localhost:7148/swagger](https://localhost:7148/swagger) or [http://localhost:5000/swagger](http://localhost:5000/swagger)
+3. Navigate to Swagger: [https://localhost:5001/swagger](https://localhost:5001/swagger) or [http://localhost:5000/swagger](http://localhost:5000/swagger)
 
 ---
 
