@@ -22,8 +22,9 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
         // Initialize schema
         var connectionFactory = new NpgsqlConnectionFactory(_postgresContainer.GetConnectionString());
+        var passwordHasher = new InventoryManagement.Application.Auth.PasswordHasher();
         var logger = new Microsoft.Extensions.Logging.Abstractions.NullLogger<DatabaseInitializer>();
-        var initializer = new DatabaseInitializer(connectionFactory, logger);
+        var initializer = new DatabaseInitializer(connectionFactory, passwordHasher, logger);
         await initializer.InitializeAsync();
     }
 

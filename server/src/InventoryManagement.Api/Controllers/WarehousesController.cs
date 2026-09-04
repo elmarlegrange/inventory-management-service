@@ -1,10 +1,12 @@
 using InventoryManagement.Application.Stock;
 using InventoryManagement.Application.Warehouses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("warehouses")]
 [Produces("application/json", "application/problem+json")]
 public sealed class WarehousesController : ControllerBase
@@ -34,8 +36,11 @@ public sealed class WarehousesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(WarehouseDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<WarehouseDto>> Create([FromBody] CreateWarehouseRequest request, CancellationToken cancellationToken)
     {
@@ -55,9 +60,12 @@ public sealed class WarehousesController : ControllerBase
     }
 
     [HttpPost("{code}/stock")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AddStock(
         [FromRoute] string code,

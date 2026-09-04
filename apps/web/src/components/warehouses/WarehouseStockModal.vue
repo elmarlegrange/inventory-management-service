@@ -5,7 +5,10 @@ import LoadingSpinner from '../common/LoadingSpinner.vue';
 import ErrorAlert from '../common/ErrorAlert.vue';
 import { warehousesApi } from '../../api/warehousesApi';
 import { formatErrorMessage } from '../../api/apiClient';
+import { useAuth } from '../../composables/useAuth';
 import type { WarehouseDto, WarehouseStockItemDto } from '../../types';
+
+const { isAdmin } = useAuth();
 
 const props = defineProps<{
   isOpen: boolean;
@@ -82,7 +85,7 @@ watch(
           <span class="summary-label">Total Inventory Stored:</span>
           <span class="badge badge-stock">{{ totalItems }} units</span>
         </div>
-        <button class="btn btn-primary btn-sm" @click="$emit('requestAddStock')">
+        <button v-if="isAdmin" class="btn btn-primary btn-sm" @click="$emit('requestAddStock')">
           + Add Stock
         </button>
       </div>

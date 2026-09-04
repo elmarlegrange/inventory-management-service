@@ -8,7 +8,10 @@ import AddStockModal from './AddStockModal.vue';
 import WarehouseStockModal from './WarehouseStockModal.vue';
 import { warehousesApi } from '../../api/warehousesApi';
 import { formatErrorMessage } from '../../api/apiClient';
+import { useAuth } from '../../composables/useAuth';
 import type { WarehouseDto } from '../../types';
+
+const { isAdmin } = useAuth();
 
 const warehouses = ref<WarehouseDto[]>([]);
 const isLoading = ref(true);
@@ -79,7 +82,7 @@ onMounted(() => {
           placeholder="Filter by code or name..."
           class="search-input"
         />
-        <button class="btn btn-primary" @click="isCreateModalOpen = true">
+        <button v-if="isAdmin" class="btn btn-primary" @click="isCreateModalOpen = true">
           <span>+</span> Add Warehouse
         </button>
       </div>
@@ -99,7 +102,7 @@ onMounted(() => {
       v-else-if="warehouses.length === 0"
       title="No Warehouses Registered"
       description="No distribution facilities exist yet. Register your first warehouse location."
-      action-text="Add Warehouse"
+      :action-text="isAdmin ? 'Add Warehouse' : undefined"
       @action="isCreateModalOpen = true"
     />
 
@@ -127,7 +130,7 @@ onMounted(() => {
                 <button class="btn btn-outline" @click="openStockModal(warehouse)">
                   🔍 View Inventory
                 </button>
-                <button class="btn btn-secondary" @click="openAddStockModal(warehouse)">
+                <button v-if="isAdmin" class="btn btn-secondary" @click="openAddStockModal(warehouse)">
                   + Add Stock
                 </button>
               </div>

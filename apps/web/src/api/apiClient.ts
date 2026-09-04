@@ -13,6 +13,28 @@ export const apiClient = axios.create({
   }
 });
 
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('auth_token');
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      if (!error.config?.url?.includes('/auth/login')) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+        window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 /**
  * Extracts structured RFC 7807 ProblemDetails from an Axios error, if present.
  */

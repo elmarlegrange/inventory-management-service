@@ -1,9 +1,11 @@
 using InventoryManagement.Application.Orders;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("orders")]
 [Produces("application/json", "application/problem+json")]
 public sealed class OrdersController : ControllerBase

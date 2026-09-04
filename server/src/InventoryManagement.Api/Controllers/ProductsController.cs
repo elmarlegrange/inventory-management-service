@@ -1,10 +1,12 @@
 using InventoryManagement.Application.Products;
 using InventoryManagement.Application.Stock;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("products")]
 [Produces("application/json", "application/problem+json")]
 public sealed class ProductsController : ControllerBase

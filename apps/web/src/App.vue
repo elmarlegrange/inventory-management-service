@@ -1,11 +1,21 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import ProductList from './components/products/ProductList.vue';
 import WarehouseList from './components/warehouses/WarehouseList.vue';
 import CreateOrderForm from './components/orders/CreateOrderForm.vue';
+import LoginModal from './components/auth/LoginModal.vue';
+import { useAuth } from './composables/useAuth';
 
 type ActiveTab = 'products' | 'warehouses' | 'orders';
 const activeTab = ref<ActiveTab>('products');
+
+const { isAuthenticated, currentUser, isAdmin, showLoginModal, logout, openLoginModal } = useAuth();
+
+onMounted(() => {
+  if (!isAuthenticated.value) {
+    openLoginModal();
+  }
+});
 </script>
 
 <template>
@@ -44,7 +54,23 @@ const activeTab = ref<ActiveTab>('products');
         </nav>
 
         <div class="header-status">
-          <span class="badge badge-connected">● API Online</span>
+          <div v-if="isAuthenticated && currentUser" class="user-profile">
+            <span class="user-name">👤 {{ currentUser.username }}</span>
+            <span :class="['role-badge', isAdmin ? 'role-admin' : 'role-user']">
+              {{ currentUser.role }}
+            </span>
+            <button class="btn-auth-action" @click="openLoginModal" title="Switch Account">
+              Switch
+            </button>
+            <button class="btn-auth-action btn-logout" @click="logout" title="Sign Out">
+              Sign Out
+            </button>
+          </div>
+          <div v-else class="auth-actions">
+            <button class="btn-sign-in" @click="openLoginModal">
+              🔑 Sign In
+            </button>
+          </div>
         </div>
       </div>
     </header>
@@ -54,6 +80,11 @@ const activeTab = ref<ActiveTab>('products');
       <WarehouseList v-show="activeTab === 'warehouses'" />
       <CreateOrderForm v-show="activeTab === 'orders'" />
     </main>
+
+    <LoginModal
+      :is-open="showLoginModal"
+      @close="showLoginModal = false"
+    />
   </div>
 </template>
 
@@ -100,11 +131,6 @@ const activeTab = ref<ActiveTab>('products');
   line-height: 1.2;
 }
 
-.subtext {
-  font-size: 0.8rem;
-  color: #64748b;
-}
-
 .nav-tabs {
   display: flex;
   align-items: center;
@@ -142,21 +168,78 @@ const activeTab = ref<ActiveTab>('products');
   gap: 0.5rem;
 }
 
-.badge-tech {
-  background: #f1f5f9;
-  color: #334155;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.25rem 0.6rem;
-  border-radius: 9999px;
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
 }
 
-.badge-connected {
-  background: #dcfce7;
-  color: #166534;
-  font-size: 0.75rem;
+.user-name {
+  font-size: 0.85rem;
   font-weight: 600;
-  padding: 0.25rem 0.6rem;
+  color: #1e293b;
+}
+
+.role-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
   border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.role-admin {
+  background: #ede9fe;
+  color: #6b21a8;
+  border: 1px solid #ddd6fe;
+}
+
+.role-user {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.btn-auth-action {
+  background: transparent;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-auth-action:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.btn-logout:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.btn-sign-in {
+  background: #2563eb;
+  color: white;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-sign-in:hover {
+  background: #1d4ed8;
 }
 </style>

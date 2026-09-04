@@ -18,6 +18,10 @@ export default defineConfig({
             '/orders': {
                 target: apiTarget,
                 changeOrigin: true
+            },
+            '/auth': {
+                target: apiTarget,
+                changeOrigin: true
             }
         }
     }

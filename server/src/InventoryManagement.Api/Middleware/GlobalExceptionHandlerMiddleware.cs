@@ -56,6 +56,19 @@ public sealed class GlobalExceptionHandlerMiddleware
 
         switch (exception)
         {
+            case InvalidCredentialsException credentialsEx:
+            {
+                var problem = new ProblemDetails
+                {
+                    Status = StatusCodes.Status401Unauthorized,
+                    Title = "Unauthorized",
+                    Detail = credentialsEx.Message,
+                    Instance = instance,
+                    Type = "https://tools.ietf.org/html/rfc7235#section-3.1"
+                };
+                return (StatusCodes.Status401Unauthorized, problem);
+            }
+
             case ValidationException validationEx:
             {
                 var problem = new ProblemDetails
