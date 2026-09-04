@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import ProductList from './components/products/ProductList.vue';
+import WarehouseList from './components/warehouses/WarehouseList.vue';
+
+type ActiveTab = 'products' | 'warehouses';
+const activeTab = ref<ActiveTab>('products');
 </script>
 
 <template>
@@ -14,6 +19,23 @@ import ProductList from './components/products/ProductList.vue';
           </div>
         </div>
 
+        <nav class="nav-tabs">
+          <button
+            class="tab-btn"
+            :class="{ active: activeTab === 'products' }"
+            @click="activeTab = 'products'"
+          >
+            📋 Products
+          </button>
+          <button
+            class="tab-btn"
+            :class="{ active: activeTab === 'warehouses' }"
+            @click="activeTab = 'warehouses'"
+          >
+            🏢 Warehouses
+          </button>
+        </nav>
+
         <div class="header-status">
           <span class="badge badge-tech">.NET 10 & PostgreSQL</span>
           <span class="badge badge-connected">● API Online</span>
@@ -22,7 +44,8 @@ import ProductList from './components/products/ProductList.vue';
     </header>
 
     <main class="container">
-      <ProductList />
+      <ProductList v-show="activeTab === 'products'" />
+      <WarehouseList v-show="activeTab === 'warehouses'" />
     </main>
   </div>
 </template>
@@ -37,7 +60,7 @@ import ProductList from './components/products/ProductList.vue';
 .app-header {
   background: #ffffff;
   border-bottom: 1px solid #e2e8f0;
-  padding: 1rem 0;
+  padding: 0.85rem 0;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
@@ -73,6 +96,37 @@ import ProductList from './components/products/ProductList.vue';
 .subtext {
   font-size: 0.8rem;
   color: #64748b;
+}
+
+.nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f1f5f9;
+  padding: 0.25rem;
+  border-radius: 8px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  padding: 0.45rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tab-btn:hover {
+  color: #0f172a;
+}
+
+.tab-btn.active {
+  background: #ffffff;
+  color: #2563eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .header-status {

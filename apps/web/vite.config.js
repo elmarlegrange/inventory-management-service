@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
+var apiTarget = process.env.VITE_API_URL || 'http://localhost:8080';
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [vue()],
@@ -7,15 +8,15 @@ export default defineConfig({
         port: 3000,
         proxy: {
             '/products': {
-                target: 'http://localhost:8080',
+                target: apiTarget,
                 changeOrigin: true
             },
             '/warehouses': {
-                target: 'http://localhost:8080',
+                target: apiTarget,
                 changeOrigin: true
             },
             '/orders': {
-                target: 'http://localhost:8080',
+                target: apiTarget,
                 changeOrigin: true
             }
         }
