@@ -42,14 +42,15 @@ A high-performance, containerized .NET 10 REST API for multi-warehouse inventory
 
 ### Option 1: Running via Docker Compose (Recommended)
 
-Start the PostgreSQL database and API service with a single command:
+Start the full stack (PostgreSQL, .NET 10 API, and Vue 3 Web App) with a single command:
 
 ```bash
 docker compose up --build -d
 ```
 
-- **Swagger UI**: [http://localhost:8080/swagger](http://localhost:8080/swagger)
+- **Web App (Vue 3 SPA)**: [http://localhost:3000](http://localhost:3000)
 - **API Base URL**: `http://localhost:8080`
+- **Swagger UI**: [http://localhost:8080/swagger](http://localhost:8080/swagger)
 
 To stop and remove containers:
 ```bash
@@ -158,27 +159,6 @@ If requested quantity exceeds available stock, the API returns a structured Prob
   "missingQuantity": 6
 }
 ```
-
----
-
-## Concurrency & Data Integrity
-
-Stock transfers use **Pessimistic Row-Level Locking** inside an explicit database transaction:
-
-```sql
-SELECT quantity 
-FROM stock 
-WHERE UPPER(warehouse_code) = UPPER(@SourceWarehouseCode) 
-  AND UPPER(product_code) = UPPER(@ProductCode) 
-FOR UPDATE;
-```
-
-1. Acquires an exclusive row lock on the source stock record.
-2. Evaluates stock sufficiency within the locked transaction.
-3. Debits source warehouse stock.
-4. Atomically credits destination warehouse stock using upsert (`ON CONFLICT (warehouse_code, product_code) DO UPDATE SET quantity = stock.quantity + EXCLUDED.quantity`).
-5. Appends an audit entry to the `orders` table.
-6. Commits the transaction atomically or rolls back cleanly on error.
 
 ---
 

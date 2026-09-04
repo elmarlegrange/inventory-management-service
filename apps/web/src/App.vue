@@ -2,8 +2,9 @@
 import { ref } from 'vue';
 import ProductList from './components/products/ProductList.vue';
 import WarehouseList from './components/warehouses/WarehouseList.vue';
+import CreateOrderForm from './components/orders/CreateOrderForm.vue';
 
-type ActiveTab = 'products' | 'warehouses';
+type ActiveTab = 'products' | 'warehouses' | 'orders';
 const activeTab = ref<ActiveTab>('products');
 </script>
 
@@ -15,7 +16,6 @@ const activeTab = ref<ActiveTab>('products');
           <span class="logo">📦</span>
           <div>
             <h1>Inventory Management Service</h1>
-            <span class="subtext">Multi-Warehouse Stock & Order Engine</span>
           </div>
         </div>
 
@@ -34,10 +34,16 @@ const activeTab = ref<ActiveTab>('products');
           >
             🏢 Warehouses
           </button>
+          <button
+            class="tab-btn"
+            :class="{ active: activeTab === 'orders' }"
+            @click="activeTab = 'orders'"
+          >
+            🔄 Stock Transfers
+          </button>
         </nav>
 
         <div class="header-status">
-          <span class="badge badge-tech">.NET 10 & PostgreSQL</span>
           <span class="badge badge-connected">● API Online</span>
         </div>
       </div>
@@ -46,6 +52,7 @@ const activeTab = ref<ActiveTab>('products');
     <main class="container">
       <ProductList v-show="activeTab === 'products'" />
       <WarehouseList v-show="activeTab === 'warehouses'" />
+      <CreateOrderForm v-show="activeTab === 'orders'" />
     </main>
   </div>
 </template>
